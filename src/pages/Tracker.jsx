@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getMuscleGroup } from '../data/exercises.js'
 import { useUserStorage } from '../hooks/useUserStorage.js'
 import { STORE, dayShortName, findLastPerformance } from '../lib/program.js'
+import { unitLabel } from '../lib/units.js'
 import RestTimer from '../components/RestTimer.jsx'
 
 const emptySet = () => ({ weight: '', reps: '' })
@@ -34,6 +35,8 @@ export default function Tracker() {
   const [program] = useUserStorage(STORE.program, null)
   const [currentDay, setCurrentDay] = useUserStorage(STORE.currentDay, 0)
   const [history, setHistory] = useUserStorage(STORE.history, [])
+  const [settings] = useUserStorage(STORE.settings, { unit: 'kg' })
+  const unit = unitLabel(settings?.unit)
   const [workout, setWorkout] = useState([])
   const [justFinished, setJustFinished] = useState(null)
 
@@ -88,7 +91,7 @@ export default function Tracker() {
     const volume = exercises.reduce((v, e) => v + e.volume, 0)
     const sets = exercises.reduce((n, e) => n + e.sets.length, 0)
     advance(
-      { id: Date.now(), date: new Date().toISOString(), split: program.splitName, day: today.name, volume, sets, exercises },
+      { id: Date.now(), date: new Date().toISOString(), split: program.splitName, day: today.name, volume, sets, exercises, unit },
       false
     )
   }
@@ -129,7 +132,7 @@ export default function Tracker() {
           <div className="big">{justFinished.rest ? '😌' : '🔥'}</div>
           <h2>{justFinished.rest ? 'Rest complete!' : `${dayShortName(justFinished.done)} done!`}</h2>
           <p className="next-line">
-            {!justFinished.rest && <>{justFinished.volume.toLocaleString()} kg of total volume logged.<br /></>}
+            {!justFinished.rest && <>{justFinished.volume.toLocaleString()} {unit} of total volume logged.<br /></>}
             Tomorrow: <b>{justFinished.nextRest ? '😴 Rest Day' : dayShortName(justFinished.next)}</b>
             {justFinished.nextMuscles ? ` — ${justFinished.nextMuscles}` : ''}
           </p>
@@ -166,7 +169,7 @@ export default function Tracker() {
           <div style={{ textAlign: 'right' }}>
             <span className="field-label">Live volume</span>
             <div style={{ fontFamily: 'var(--font-head)', fontSize: '2rem', color: 'var(--accent)' }}>
-              {liveVolume.toLocaleString()} <span style={{ fontSize: '1rem', color: 'var(--text-mute)' }}>kg</span>
+              {liveVolume.toLocaleString()} <span style={{ fontSize: '1rem', color: 'var(--text-mute)' }}>{unit}</span>
             </div>
           </div>
         )}
@@ -221,15 +224,15 @@ export default function Tracker() {
 
                 {last?.top && (
                   <div className="last-time">
-                    ↩ Last time: <strong>{last.top.weight}kg × {last.top.reps}</strong>
-                    {' · '}{last.volume.toLocaleString()} kg total
+                    ↩ Last time: <strong>{last.top.weight}{last.unit} × {last.top.reps}</strong>
+                    {' · '}{last.volume.toLocaleString()} {last.unit} total
                     <span className="ago"> ({new Date(last.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })})</span>
                   </div>
                 )}
 
                 <div className="set-row" style={{ color: 'var(--text-mute)', fontSize: '0.74rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
                   <span style={{ textAlign: 'center' }}>Set</span>
-                  <span>Weight (kg)</span>
+                  <span>Weight ({unit})</span>
                   <span>Reps</span>
                   <span></span>
                 </div>
@@ -283,7 +286,7 @@ export default function Tracker() {
                   {' · '}{h.split} · {h.sets} sets
                 </div>
               </div>
-              <div className="vol">{h.volume.toLocaleString()} kg</div>
+              <div className="vol">{h.volume.toLocaleString()} {h.unit || 'kg'}</div>
             </div>
           ))}
         </section>

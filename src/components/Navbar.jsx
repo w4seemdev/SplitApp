@@ -3,11 +3,11 @@ import { useAuth } from '../context/AuthContext.jsx'
 import ThemeToggle from './ThemeToggle.jsx'
 
 const links = [
-  { to: '/', label: 'Home', end: true },
   { to: '/splits', label: 'Splits' },
   { to: '/plan', label: 'My Plan' },
   { to: '/exercises', label: 'Exercises' },
   { to: '/tracker', label: 'Tracker' },
+  { to: '/progress', label: 'Progress' },
 ]
 
 export default function Navbar() {
@@ -24,7 +24,7 @@ export default function Navbar() {
       <div className="container nav-inner">
         <NavLink to="/" className="brand">
           <img src="/dumbbell.svg" alt="" />
-          Iron<span>Path</span>
+          Split<span>App</span>
         </NavLink>
 
         <ul className="nav-links">
@@ -45,7 +45,9 @@ export default function Navbar() {
           <ThemeToggle />
           {user ? (
             <>
-              <span className="nav-user">Hi, {user.name.split(' ')[0]}</span>
+              <NavLink to="/settings" className="nav-user" title="Account & settings">
+                Hi, {user.name.split(' ')[0]} ⚙
+              </NavLink>
               <button className="btn-ghost btn-sm" onClick={handleLogout}>Log Out</button>
             </>
           ) : (

@@ -1,4 +1,4 @@
-# 🏋️ IronPath
+# 🏋️ SplitApp
 
 A science-based **workout planner & tracker**. Pick a proven training split, choose your
 exercises for each day, and track every set — with your progress saved per account.

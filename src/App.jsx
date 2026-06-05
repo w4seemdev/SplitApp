@@ -7,7 +7,10 @@ import Splits from './pages/Splits.jsx'
 import Plan from './pages/Plan.jsx'
 import Exercises from './pages/Exercises.jsx'
 import Tracker from './pages/Tracker.jsx'
+import Progress from './pages/Progress.jsx'
+import Settings from './pages/Settings.jsx'
 import Login from './pages/Login.jsx'
+import NotFound from './pages/NotFound.jsx'
 
 export default function App() {
   return (
@@ -35,6 +38,23 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/progress"
+            element={
+              <ProtectedRoute>
+                <Progress />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

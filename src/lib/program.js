@@ -9,7 +9,8 @@ import { getMuscleGroup } from '../data/exercises.js'
 export const STORE = {
   program: 'program',       // { splitId, splitName, days: [...] }
   currentDay: 'currentDay', // index of the NEXT day to train
-  history: 'history',       // [{ id, date, day, volume, sets, exercises: [...] }]
+  history: 'history',       // [{ id, date, day, volume, sets, unit, exercises: [...] }]
+  settings: 'settings',     // { unit: 'kg' | 'lb' }
 }
 
 // Turn a stored exercise reference into a full object with display info.
@@ -72,7 +73,7 @@ export function dayShortName(name) {
 export function findLastPerformance(history, exerciseName) {
   for (const entry of history) {
     const found = entry.exercises?.find((e) => e.name === exerciseName)
-    if (found) return { ...found, date: entry.date }
+    if (found) return { ...found, date: entry.date, unit: entry.unit || 'kg' }
   }
   return null
 }

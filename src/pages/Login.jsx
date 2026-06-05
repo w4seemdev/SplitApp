@@ -41,7 +41,7 @@ export default function Login() {
       <div className="auth-card card">
         <Link to="/" className="brand" style={{ justifyContent: 'center', marginBottom: 6 }}>
           <img src="/dumbbell.svg" alt="" />
-          Iron<span>Path</span>
+          Split<span>App</span>
         </Link>
         <h1 className="auth-title">{isSignup ? 'Create your account' : 'Welcome back'}</h1>
         <p className="auth-sub">

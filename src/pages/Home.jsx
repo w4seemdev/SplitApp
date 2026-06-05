@@ -54,7 +54,7 @@ export default function Home() {
               Start <span className="accent">growing.</span>
             </h1>
             <p className="hero-lead">
-              IronPath turns the science of muscle growth into a simple system: pick a proven
+              SplitApp turns the science of muscle growth into a simple system: pick a proven
               training split, follow it muscle-by-muscle, and track every set you lift.
             </p>
             <div className="hero-cta">
