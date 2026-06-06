@@ -26,8 +26,18 @@ export default function Login() {
 
     setBusy(true)
     try {
-      if (isSignup) await signup(form.name, form.email, form.password)
-      else await login(form.email, form.password)
+      if (isSignup) {
+        const res = await signup(form.name, form.email, form.password)
+        // Supabase with email confirmation on: no session yet, prompt to confirm.
+        if (res?.needsConfirmation) {
+          setMode('login')
+          setError('Account created! Check your email to confirm, then log in.')
+          setBusy(false)
+          return
+        }
+      } else {
+        await login(form.email, form.password)
+      }
       navigate(dest, { replace: true })
     } catch (err) {
       setError(err.message || 'Something went wrong.')
