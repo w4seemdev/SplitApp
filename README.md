@@ -66,6 +66,3 @@ themes/          theme-dark-gym.css            ← alternate "gym" theme backup
 Accounts are stored **in the browser** (localStorage) for demo purposes — passwords are hashed,
 but data lives on the device, not a secure server. For real multi-device accounts you'd add a
 backend (database + server-side auth).
-
----
-
