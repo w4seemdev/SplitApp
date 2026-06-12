@@ -13,6 +13,13 @@ dist-ssr
 .env
 .env.local
 
+# Graphify generated output
+graphify-out/
+
+# Claude Code local-only files (keep .claude/settings.json with the shared hooks)
+.claude/settings.local.json
+.claude/launch.json
+
 # Editor / OS
 .vscode/*
 !.vscode/extensions.json

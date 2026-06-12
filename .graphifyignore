@@ -1,0 +1,33 @@
+# Graphify: code files only — no docs, markdown, or images
+*.md
+*.mdx
+*.qmd
+docs/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.ico
+*.webmanifest
+
+README.md
+.env.example
+.hintrc
+_redirects
+# graphify classifies .html as a document (needs LLM); index.html is just the Vite mount shell
+index.html
+
+# Build artifacts and dependencies (mirrors .gitignore)
+node_modules/
+dist/
+dist-ssr/
+graphify-out/
+logs/
+*.log
+*.local
+.env
+.env.local
+.vscode/
+.idea/

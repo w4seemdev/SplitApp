@@ -4,11 +4,11 @@ import { MUSCLE_GROUPS } from '../data/exercises.js'
 
 // Little weekly-volume visual for the hero — illustrative "sets per week" bars.
 const heroBars = [
-  { name: 'Chest', pct: 82, color: '#ff4d2e' },
-  { name: 'Back', pct: 90, color: '#2e8bff' },
-  { name: 'Shoulders', pct: 70, color: '#ffb02e' },
-  { name: 'Legs', pct: 95, color: '#ff4d8d' },
-  { name: 'Arms', pct: 60, color: '#9b5cff' },
+  { name: 'Chest', pct: 82, color: '#e8485e' },
+  { name: 'Back', pct: 90, color: '#3f8ae6' },
+  { name: 'Shoulders', pct: 70, color: '#eda63b' },
+  { name: 'Legs', pct: 95, color: '#e2549c' },
+  { name: 'Arms', pct: 60, color: '#9a6cf0' },
 ]
 
 const features = [

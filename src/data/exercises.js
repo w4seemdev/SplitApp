@@ -8,7 +8,7 @@ export const MUSCLE_GROUPS = [
     name: 'Chest',
     anatomy: 'Pectoralis major & minor',
     blurb: 'Big fan-shaped muscles that press and push the arms across the body.',
-    color: '#ff4d2e',
+    color: '#e8485e',
     exercises: [
       { name: 'Barbell Bench Press', type: 'Compound', equipment: 'Barbell', sets: '3–4', reps: '6–10' },
       { name: 'Incline Dumbbell Press', type: 'Compound', equipment: 'Dumbbell', sets: '3–4', reps: '8–12' },
@@ -23,7 +23,7 @@ export const MUSCLE_GROUPS = [
     name: 'Back',
     anatomy: 'Lats, traps, rhomboids, erectors',
     blurb: 'The wing-shaped lats and upper-back muscles that build the V-taper and pull.',
-    color: '#2e8bff',
+    color: '#3f8ae6',
     exercises: [
       { name: 'Pull-Up', type: 'Compound', equipment: 'Bodyweight', sets: '3–4', reps: '6–12' },
       { name: 'Barbell Row', type: 'Compound', equipment: 'Barbell', sets: '3–4', reps: '6–10' },
@@ -38,7 +38,7 @@ export const MUSCLE_GROUPS = [
     name: 'Shoulders',
     anatomy: 'Front, side & rear deltoids',
     blurb: 'Three-headed deltoids that move the arm in nearly every direction.',
-    color: '#ffb02e',
+    color: '#eda63b',
     exercises: [
       { name: 'Overhead Press', type: 'Compound', equipment: 'Barbell', sets: '3–4', reps: '6–10' },
       { name: 'Dumbbell Shoulder Press', type: 'Compound', equipment: 'Dumbbell', sets: '3', reps: '8–12' },
@@ -53,7 +53,7 @@ export const MUSCLE_GROUPS = [
     name: 'Biceps',
     anatomy: 'Biceps brachii, brachialis',
     blurb: 'Front-of-arm muscles that flex the elbow and supinate the forearm.',
-    color: '#9b5cff',
+    color: '#9a6cf0',
     exercises: [
       { name: 'Barbell Curl', type: 'Isolation', equipment: 'Barbell', sets: '3', reps: '8–12' },
       { name: 'Dumbbell Hammer Curl', type: 'Isolation', equipment: 'Dumbbell', sets: '3', reps: '10–12' },
@@ -67,7 +67,7 @@ export const MUSCLE_GROUPS = [
     name: 'Triceps',
     anatomy: 'Triceps brachii (3 heads)',
     blurb: 'Two-thirds of your upper-arm mass — they extend the elbow.',
-    color: '#22c1a6',
+    color: '#27b899',
     exercises: [
       { name: 'Close-Grip Bench Press', type: 'Compound', equipment: 'Barbell', sets: '3', reps: '8–10' },
       { name: 'Triceps Pushdown', type: 'Isolation', equipment: 'Cable', sets: '3', reps: '10–15' },
@@ -81,7 +81,7 @@ export const MUSCLE_GROUPS = [
     name: 'Quads',
     anatomy: 'Quadriceps femoris',
     blurb: 'Front-thigh muscles that extend the knee — your biggest leg movers.',
-    color: '#ff4d8d',
+    color: '#e2549c',
     exercises: [
       { name: 'Back Squat', type: 'Compound', equipment: 'Barbell', sets: '3–4', reps: '5–10' },
       { name: 'Leg Press', type: 'Compound', equipment: 'Machine', sets: '3', reps: '10–15' },
@@ -95,7 +95,7 @@ export const MUSCLE_GROUPS = [
     name: 'Hamstrings & Glutes',
     anatomy: 'Hamstrings, gluteus maximus',
     blurb: 'Back-thigh and hip muscles that extend the hip and bend the knee.',
-    color: '#f2545b',
+    color: '#c2503a',
     exercises: [
       { name: 'Romanian Deadlift', type: 'Compound', equipment: 'Barbell', sets: '3–4', reps: '8–12' },
       { name: 'Hip Thrust', type: 'Compound', equipment: 'Barbell', sets: '3', reps: '8–12' },
@@ -109,7 +109,7 @@ export const MUSCLE_GROUPS = [
     name: 'Calves',
     anatomy: 'Gastrocnemius, soleus',
     blurb: 'Lower-leg muscles that point the foot and stabilize the ankle.',
-    color: '#4dd0a7',
+    color: '#3cb887',
     exercises: [
       { name: 'Standing Calf Raise', type: 'Isolation', equipment: 'Machine', sets: '4', reps: '12–15' },
       { name: 'Seated Calf Raise', type: 'Isolation', equipment: 'Machine', sets: '4', reps: '15–20' },
@@ -121,7 +121,7 @@ export const MUSCLE_GROUPS = [
     name: 'Core',
     anatomy: 'Rectus abdominis, obliques',
     blurb: 'Trunk muscles that transfer force and stabilize every heavy lift.',
-    color: '#ffd23f',
+    color: '#d9a91c',
     exercises: [
       { name: 'Hanging Leg Raise', type: 'Isolation', equipment: 'Bodyweight', sets: '3', reps: '10–15' },
       { name: 'Cable Crunch', type: 'Isolation', equipment: 'Cable', sets: '3', reps: '12–20' },
