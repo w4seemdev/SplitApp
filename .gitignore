@@ -12,6 +12,12 @@ dist-ssr
 # Local env / secrets (keep .env.example, ignore real keys)
 .env
 .env.local
+.env.*.local
+*.pem
+service-account*.json
+credentials*.json
+client_secret*.json
+token.json
 
 # Graphify generated output
 graphify-out/
