@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 
 const KEY = 'ironpath:theme'
 
-// Toggles between the light and dark Tailwind palettes by flipping the
-// data-theme attribute on <html>. The choice is saved in localStorage and
-// re-applied before paint by the inline script in index.html.
+// Toggles between the light and dark palettes by flipping the data-theme
+// attribute on <html>. The choice is saved in localStorage and re-applied
+// before paint by the inline script in index.html (do not rename KEY).
 export default function ThemeToggle() {
   const [theme, setTheme] = useState(
     () => document.documentElement.getAttribute('data-theme') || 'dark'
@@ -21,9 +21,10 @@ export default function ThemeToggle() {
       className="theme-toggle"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      aria-label="Toggle color theme"
+      aria-label="Dark mode"
+      aria-pressed={isDark}
     >
-      {isDark ? '☀️' : '🌙'}
+      <span aria-hidden="true">{isDark ? '☀️' : '🌙'}</span>
     </button>
   )
 }

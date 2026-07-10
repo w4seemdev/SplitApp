@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
+import usePageTitle from '../hooks/usePageTitle.js'
 
 export default function NotFound() {
+  usePageTitle('Page not found')
   return (
     <div className="container">
       <div className="empty" style={{ marginTop: 80, marginBottom: 80 }}>
-        <div className="big">🤷</div>
+        <div className="big" aria-hidden="true">🤷</div>
         <h1 style={{ fontSize: '3rem', marginBottom: 8 }}>404</h1>
         <h3 style={{ marginBottom: 12 }}>This page took a rest day</h3>
         <p style={{ maxWidth: 420, margin: '0 auto 22px' }}>

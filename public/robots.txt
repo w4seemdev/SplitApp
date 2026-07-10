@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://split-app-tawny.vercel.app/sitemap.xml

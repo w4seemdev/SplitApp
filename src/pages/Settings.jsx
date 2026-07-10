@@ -63,8 +63,8 @@ export default function Settings() {
     }
   }
 
-  function handleLogout() {
-    logout()
+  async function handleLogout() {
+    await logout()
     navigate('/')
   }
 
@@ -113,13 +113,20 @@ export default function Settings() {
         <div className="card settings-card">
           <h3>Your data</h3>
           <p className="muted" style={{ marginBottom: 14 }}>
-            Everything is stored in this browser. Export a backup, or move it to another device.
+            Your program, history and settings sync to your account in the cloud, with a copy kept in this
+            browser so the app works offline. You can also download a JSON backup anytime.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            <button className="btn btn-ghost" onClick={exportData}>⬇ Export backup</button>
-            <label className="btn btn-ghost" style={{ cursor: 'pointer' }}>
+            <button className="btn btn-ghost" onClick={exportData}>⬇ Export my data (JSON)</button>
+            <label htmlFor="import-backup" className="btn btn-ghost" style={{ cursor: 'pointer' }}>
               ⬆ Import backup
-              <input type="file" accept="application/json" onChange={importData} style={{ display: 'none' }} />
+              <input
+                id="import-backup"
+                type="file"
+                accept="application/json"
+                onChange={importData}
+                style={{ display: 'none' }}
+              />
             </label>
           </div>
         </div>

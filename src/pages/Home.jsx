@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { SPLITS } from '../data/splits.js'
-import { MUSCLE_GROUPS } from '../data/exercises.js'
+import { MUSCLE_GROUPS, ALL_EXERCISES } from '../data/exercises.js'
+import { usePageTitle } from '../hooks/usePageTitle.js'
 
 // Little weekly-volume visual for the hero — illustrative "sets per week" bars.
 const heroBars = [
@@ -20,7 +21,7 @@ const features = [
   {
     ic: '📚',
     title: 'Exercise Library',
-    text: 'Browse 45+ exercises grouped by muscle, with recommended sets and reps for hypertrophy.',
+    text: `Browse ${ALL_EXERCISES.length} exercises grouped by muscle, with recommended sets and reps for hypertrophy.`,
   },
   {
     ic: '📈',
@@ -42,6 +43,7 @@ const principles = [
 ]
 
 export default function Home() {
+  usePageTitle('Home')
   return (
     <>
       {/* ---------------- HERO ---------------- */}
@@ -71,16 +73,29 @@ export default function Home() {
                 <div className="lbl">Muscle groups</div>
               </div>
               <div className="hero-stat">
-                <div className="num">45+</div>
+                <div className="num">{ALL_EXERCISES.length}</div>
                 <div className="lbl">Exercises</div>
               </div>
             </div>
           </div>
 
           <div className="hero-visual">
-            <h4>WEEKLY VOLUME · SETS</h4>
+            {/* Illustrative chart, not real data — a heading here also broke the h1→h2 outline. */}
+            <div
+              aria-hidden="true"
+              style={{
+                fontFamily: 'var(--font-cond)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                color: 'var(--text-dim)',
+                letterSpacing: 3,
+                marginBottom: 20,
+              }}
+            >
+              WEEKLY VOLUME · SETS
+            </div>
             {heroBars.map((b) => (
-              <div className="muscle-bar" key={b.name}>
+              <div className="muscle-bar" key={b.name} aria-hidden="true">
                 <div className="name">{b.name}</div>
                 <div className="track">
                   <div className="fill" style={{ width: `${b.pct}%`, background: b.color }} />
@@ -102,7 +117,7 @@ export default function Home() {
           <div className="grid grid-4" style={{ marginTop: 40 }}>
             {features.map((f) => (
               <div className="card feature" key={f.title}>
-                <div className="ic">{f.ic}</div>
+                <div className="ic" aria-hidden="true">{f.ic}</div>
                 <h3>{f.title}</h3>
                 <p>{f.text}</p>
               </div>

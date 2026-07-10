@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
-import * as local from '../lib/auth.js'
+import { supabase } from '../lib/supabase.js'
+import { flush as flushCloud } from '../lib/cloudStore.js'
 
 const AuthContext = createContext(null)
 
@@ -16,70 +16,78 @@ function mapUser(su) {
 }
 
 export function AuthProvider({ children }) {
-  // With Supabase, the session loads asynchronously, so start in a loading state.
-  // Without it, restore the local session synchronously.
-  const [user, setUser] = useState(() => (isSupabaseConfigured ? null : local.getSession()))
-  const [loading, setLoading] = useState(isSupabaseConfigured)
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return
     let active = true
-    supabase.auth.getSession().then(({ data }) => {
-      if (!active) return
-      setUser(mapUser(data.session?.user))
-      setLoading(false)
-    })
+    // Safety net: never leave the app stuck on the loading screen if the
+    // session request hangs (flaky gym wifi).
+    const timer = setTimeout(() => {
+      if (active) setLoading(false)
+    }, 5000)
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (active) setUser(mapUser(data.session?.user))
+      })
+      .catch(() => {})
+      .finally(() => {
+        clearTimeout(timer)
+        if (active) setLoading(false)
+      })
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(mapUser(session?.user))
     })
     return () => {
       active = false
+      clearTimeout(timer)
       sub.subscription.unsubscribe()
     }
   }, [])
 
   async function signup(name, email, password) {
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { name } },
-      })
-      if (error) throw new Error(error.message)
-      // If email confirmation is enabled, there's no session yet.
-      if (!data.session) return { needsConfirmation: true }
-      const u = mapUser(data.user)
-      setUser(u)
-      return u
-    }
-    const u = await local.signupUser(name, email, password)
-    local.saveSession(u)
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
+    })
+    if (error) throw new Error(error.message)
+    // Email confirmation enabled: the account exists but there's no session
+    // until the user clicks the link in their inbox.
+    if (!data.session) return { needsEmailConfirmation: true }
+    const u = mapUser(data.user)
     setUser(u)
     return u
   }
 
   async function login(email, password) {
-    if (isSupabaseConfigured) {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) throw new Error(error.message)
-      const u = mapUser(data.user)
-      setUser(u)
-      return u
-    }
-    const u = await local.loginUser(email, password)
-    local.saveSession(u)
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw new Error(error.message)
+    const u = mapUser(data.user)
     setUser(u)
     return u
   }
 
   async function logout() {
-    if (isSupabaseConfigured) await supabase.auth.signOut()
-    else local.clearSession()
+    flushCloud() // land any debounced workout writes before the session ends
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // network failure — the local session is cleared regardless
+    }
     setUser(null)
   }
 
+  async function resetPassword(email) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password',
+    })
+    if (error) throw new Error(error.message)
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, signup, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, signup, login, logout, resetPassword }}>
       {children}
     </AuthContext.Provider>
   )

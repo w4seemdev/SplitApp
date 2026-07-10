@@ -39,6 +39,18 @@ export default function Navbar() {
               </NavLink>
             </li>
           ))}
+          {/* Below 620px the "Hi, name" settings link is hidden, so Settings
+              needs its own entry in the scrollable mobile nav row. */}
+          {user && (
+            <li className="nav-mobile-only">
+              <NavLink
+                to="/settings"
+                className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}
+              >
+                Settings
+              </NavLink>
+            </li>
+          )}
         </ul>
 
         <div className="nav-auth">

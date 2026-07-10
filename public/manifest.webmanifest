@@ -2,11 +2,16 @@
   "name": "SplitApp — Workout Planner & Tracker",
   "short_name": "SplitApp",
   "description": "Pick a training split, build your plan, and track every set.",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0b1120",
-  "theme_color": "#0ea5e9",
+  "background_color": "#0c0c0e",
+  "theme_color": "#0c0c0e",
+  "categories": ["fitness", "health", "lifestyle"],
   "icons": [
-    { "src": "/dumbbell.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" }
+    { "src": "/icons/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
   ]
 }

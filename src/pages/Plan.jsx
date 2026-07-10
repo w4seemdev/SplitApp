@@ -1,12 +1,17 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useUserStorage } from '../hooks/useUserStorage.js'
+import { usePageTitle } from '../hooks/usePageTitle.js'
 import { STORE, poolForDay, buildDefaultProgram, makeRestDay, dayShortName } from '../lib/program.js'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 
 export default function Plan() {
+  usePageTitle('My Plan')
   const [program, setProgram] = useUserStorage(STORE.program, null)
   const [editingIdx, setEditingIdx] = useState(null)
   const [editValue, setEditValue] = useState('')
+  const [deletingIdx, setDeletingIdx] = useState(null)
+  const [showReset, setShowReset] = useState(false)
 
   // ---------- No split chosen yet ----------
   if (!program) {
@@ -55,11 +60,9 @@ export default function Plan() {
       ;[p.days[i], p.days[j]] = [p.days[j], p.days[i]]
     })
 
-  const deleteDay = (i) => {
-    if (program.days.length <= 1) return alert('Keep at least one day in your week.')
-    if (confirm(`Remove "${program.days[i].name}" from your week?`)) {
-      mutate((p) => p.days.splice(i, 1))
-    }
+  const confirmDeleteDay = () => {
+    mutate((p) => p.days.splice(deletingIdx, 1))
+    setDeletingIdx(null)
   }
 
   const addRestDay = () => mutate((p) => p.days.push(makeRestDay()))
@@ -74,10 +77,9 @@ export default function Plan() {
     setEditingIdx(null)
   }
 
-  function resetDefaults() {
-    if (confirm('Reset every day back to the recommended default exercises? This removes rest days and renames.')) {
-      setProgram(buildDefaultProgram(program.splitId))
-    }
+  function confirmReset() {
+    setProgram(buildDefaultProgram(program.splitId))
+    setShowReset(false)
   }
 
   return (
@@ -93,7 +95,7 @@ export default function Plan() {
           <Link to="/tracker" className="btn btn-primary">Start Training →</Link>
           <button className="btn btn-ghost" onClick={addRestDay}>+ Add Rest Day</button>
           <Link to="/splits" className="btn btn-ghost">Change Split</Link>
-          <button className="btn btn-ghost" onClick={resetDefaults}>Reset to Defaults</button>
+          <button className="btn btn-ghost" onClick={() => setShowReset(true)}>Reset to Defaults</button>
         </div>
       </div>
 
@@ -108,6 +110,7 @@ export default function Plan() {
                     <input
                       type="text"
                       value={editValue}
+                      aria-label="Day name"
                       onChange={(e) => setEditValue(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && saveRename()}
                       autoFocus
@@ -120,10 +123,18 @@ export default function Plan() {
                   <>
                     <h3>{isRest ? '😴 ' : ''}{day.name}</h3>
                     <div className="day-tools">
-                      <button className="tool" title="Move up" onClick={() => moveDay(dayIdx, -1)} disabled={dayIdx === 0}>↑</button>
-                      <button className="tool" title="Move down" onClick={() => moveDay(dayIdx, 1)} disabled={dayIdx === program.days.length - 1}>↓</button>
-                      <button className="tool" title="Rename" onClick={() => startRename(dayIdx)}>✏</button>
-                      <button className="tool danger" title="Delete day" onClick={() => deleteDay(dayIdx)}>✕</button>
+                      <button className="tool" title="Move up" aria-label={`Move ${day.name} up`} onClick={() => moveDay(dayIdx, -1)} disabled={dayIdx === 0}>↑</button>
+                      <button className="tool" title="Move down" aria-label={`Move ${day.name} down`} onClick={() => moveDay(dayIdx, 1)} disabled={dayIdx === program.days.length - 1}>↓</button>
+                      <button className="tool" title="Rename" aria-label={`Rename ${day.name}`} onClick={() => startRename(dayIdx)}>✏</button>
+                      <button
+                        className="tool danger"
+                        title={program.days.length <= 1 ? 'Keep at least one day in your week' : 'Delete day'}
+                        aria-label={`Delete ${day.name}`}
+                        onClick={() => setDeletingIdx(dayIdx)}
+                        disabled={program.days.length <= 1}
+                      >
+                        ✕
+                      </button>
                     </div>
                   </>
                 )}
@@ -152,9 +163,10 @@ export default function Plan() {
                             <button
                               key={ex.name}
                               className={'ex-toggle' + (on ? ' on' : '')}
+                              aria-pressed={on}
                               onClick={() => toggle(dayIdx, ex)}
                             >
-                              <span className="mark">{on ? '✓' : '+'}</span>
+                              <span className="mark" aria-hidden="true">{on ? '✓' : '+'}</span>
                               {ex.name}
                               <span className="meta">{ex.target}</span>
                             </button>
@@ -174,6 +186,30 @@ export default function Plan() {
           )
         })}
       </div>
+
+      <ConfirmDialog
+        open={deletingIdx !== null}
+        title="Delete day?"
+        message={
+          deletingIdx !== null
+            ? `Remove "${program.days[deletingIdx].name}" from your week? Its exercise picks go with it.`
+            : ''
+        }
+        confirmLabel="Delete Day"
+        danger
+        onConfirm={confirmDeleteDay}
+        onCancel={() => setDeletingIdx(null)}
+      />
+
+      <ConfirmDialog
+        open={showReset}
+        title="Reset to defaults?"
+        message="Every day goes back to the recommended default exercises. This removes rest days and renamed days."
+        confirmLabel="Reset Plan"
+        danger
+        onConfirm={confirmReset}
+        onCancel={() => setShowReset(false)}
+      />
     </div>
   )
 }

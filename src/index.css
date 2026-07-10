@@ -16,11 +16,11 @@
   --border:    #d6cfc0;
   --text:      #17140e;
   --text-dim:  #57523f;
-  --text-mute: #8c8676;
+  --text-mute: #66614f;     /* ≥4.5:1 on bg/surface/surface-2 (WCAG AA) */
 
-  --accent:      #e84a0c;   /* ember orange */
-  --accent-soft: #c03c08;   /* deeper, for text on light */
-  --accent-glow: rgba(232, 74, 12, 0.25);
+  --accent:      #c03c08;   /* ember orange — dark enough for white text (5.4:1) */
+  --accent-soft: #9c3106;   /* deeper, for text on light + hover fills */
+  --accent-glow: rgba(192, 60, 8, 0.25);
   --accent-ink:  #ffffff;   /* text on accent fills */
   --steel:       #3d6a8f;   /* secondary steel blue */
 
@@ -49,7 +49,7 @@
   --border:    #2a2a31;
   --text:      #f2efe8;
   --text-dim:  #aaa69b;
-  --text-mute: #6e6b62;
+  --text-mute: #969285;     /* ≥4.5:1 on bg/surface/surface-2 (WCAG AA) */
 
   --accent:      #ff5a1f;   /* molten orange */
   --accent-soft: #ff7a45;
@@ -124,6 +124,53 @@ h1, h2, h3, h4 {
   }
   html { scroll-behavior: auto; }
 }
+
+/* Visually hidden but readable by screen readers (live regions, labels) */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link — first focusable element, slides in on keyboard focus */
+.skip-link {
+  position: fixed;
+  top: -60px; left: 12px;
+  z-index: 200;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--font-cond);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-size: 0.88rem;
+  padding: 11px 20px;
+  border-radius: 0 0 var(--radius) var(--radius);
+  transition: top 0.15s ease;
+}
+.skip-link:focus { top: 0; }
+
+/* <main> receives programmatic focus on route change — no outline needed */
+main[tabindex="-1"]:focus { outline: none; }
+
+/* Suspense fallback while a lazy route chunk loads */
+.page-loading {
+  min-height: 40vh;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-cond);
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+/* Nav items that only appear in the <620px scrollable nav row */
+.nav-mobile-only { display: none; }
 
 /* ---------- Layout helpers ---------- */
 .container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
@@ -857,4 +904,6 @@ a.nav-user:hover { color: var(--accent-soft); }
   .section { padding: 56px 0; }
   .rest-timer { right: 12px; left: 12px; bottom: 12px; width: auto; }
   .nav-user { display: none; }
+  /* .nav-user is hidden here, so Settings gets a mobile nav entry instead */
+  .nav-mobile-only { display: block; }
 }

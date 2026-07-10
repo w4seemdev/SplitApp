@@ -1,26 +1,34 @@
 import { Link } from 'react-router-dom'
 import { useUserStorage } from '../hooks/useUserStorage.js'
+import usePageTitle from '../hooks/usePageTitle.js'
 import { STORE, dayShortName } from '../lib/program.js'
 import { convert, fmt, unitLabel } from '../lib/units.js'
 import { MUSCLE_GROUPS } from '../data/exercises.js'
 
 const MUSCLE_COLOR = Object.fromEntries(MUSCLE_GROUPS.map((m) => [m.name, m.color]))
 
-// Current streak = consecutive days (ending today, or yesterday as grace) with a workout.
+// Training streak = count of training days where the gap between consecutive
+// training days is <= 2 calendar days (scheduled rest doesn't break it);
+// a gap of 3+ days ends the streak.
 function computeStreak(history) {
   if (!history.length) return 0
-  const days = new Set(history.map((h) => new Date(h.date).toDateString()))
-  const d = new Date()
-  if (!days.has(d.toDateString())) d.setDate(d.getDate() - 1)
-  let streak = 0
-  while (days.has(d.toDateString())) {
+  const DAY_MS = 24 * 60 * 60 * 1000
+  // Unique training days at midnight-local granularity, newest first.
+  const days = [...new Set(history.map((h) => new Date(h.date).setHours(0, 0, 0, 0)))]
+    .sort((a, b) => b - a)
+  const today = new Date().setHours(0, 0, 0, 0)
+  // Math.round absorbs DST-shifted 23/25-hour days.
+  if (Math.round((today - days[0]) / DAY_MS) >= 3) return 0
+  let streak = 1
+  for (let i = 1; i < days.length; i++) {
+    if (Math.round((days[i - 1] - days[i]) / DAY_MS) >= 3) break
     streak++
-    d.setDate(d.getDate() - 1)
   }
   return streak
 }
 
 export default function Progress() {
+  usePageTitle('Progress')
   const [history] = useUserStorage(STORE.history, [])
   const [settings] = useUserStorage(STORE.settings, { unit: 'kg' })
   const unit = unitLabel(settings?.unit)
@@ -79,7 +87,7 @@ export default function Progress() {
     { k: fmt(history.length), v: 'Workouts' },
     { k: `${fmt(totalVolume)} ${unit}`, v: 'Total volume' },
     { k: fmt(totalSets), v: 'Total sets' },
-    { k: `${streak} 🔥`, v: streak === 1 ? 'Day streak' : 'Day streak' },
+    { k: `${streak} 🔥`, v: 'Training streak' },
   ]
 
   return (

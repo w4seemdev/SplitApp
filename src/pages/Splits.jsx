@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { SPLITS } from '../data/splits.js'
 import { getMuscleGroup } from '../data/exercises.js'
 import { useUserStorage } from '../hooks/useUserStorage.js'
+import { usePageTitle } from '../hooks/usePageTitle.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { STORE, buildDefaultProgram } from '../lib/program.js'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 
 // Pull the top exercises for the muscle groups a day targets (max 5 shown).
 function exercisesForDay(focusIds, limit = 5) {
@@ -20,24 +22,35 @@ function exercisesForDay(focusIds, limit = 5) {
 }
 
 export default function Splits() {
+  usePageTitle('Training Splits')
   const navigate = useNavigate()
   const { user } = useAuth()
   const [openId, setOpenId] = useState(SPLITS[0].id)
   const [program, setProgram] = useUserStorage(STORE.program, null)
   const [, setCurrentDay] = useUserStorage(STORE.currentDay, 0)
+  const [pendingSplitId, setPendingSplitId] = useState(null)
 
   const activeSplit = program?.splitId ?? null
   const open = SPLITS.find((s) => s.id === openId)
 
+  function applySplit(splitId) {
+    setProgram(buildDefaultProgram(splitId))
+    setCurrentDay(0)
+  }
+
   // Choosing a split builds a fresh default program and resets the day rotation.
-  // Requires an account so the program is saved under the user.
+  // Requires an account so the program is saved under the user; if a program
+  // already exists, confirm first — switching wipes the customized plan.
   function chooseSplit(splitId) {
     if (!user) {
       navigate('/login', { state: { from: '/splits' } })
       return
     }
-    setProgram(buildDefaultProgram(splitId))
-    setCurrentDay(0)
+    if (program) {
+      setPendingSplitId(splitId)
+      return
+    }
+    applySplit(splitId)
   }
 
   return (
@@ -57,7 +70,16 @@ export default function Splits() {
           <div
             key={s.id}
             className="card split-card"
+            role="button"
+            tabIndex={0}
+            aria-pressed={openId === s.id}
             onClick={() => setOpenId(s.id)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setOpenId(s.id)
+              }
+            }}
             style={openId === s.id ? { borderColor: 'var(--accent)' } : undefined}
           >
             <div className="top">
@@ -137,6 +159,19 @@ export default function Splits() {
           )}
         </section>
       )}
+
+      <ConfirmDialog
+        open={pendingSplitId !== null}
+        title="Switch split?"
+        message="This replaces your current plan and progress through the rotation."
+        confirmLabel="Switch Split"
+        danger
+        onConfirm={() => {
+          applySplit(pendingSplitId)
+          setPendingSplitId(null)
+        }}
+        onCancel={() => setPendingSplitId(null)}
+      />
     </div>
   )
 }

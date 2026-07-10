@@ -10,7 +10,7 @@
   --border:    #2c313b;
   --text:      #f4f6fb;
   --text-dim:  #9aa3b2;
-  --text-mute: #6b7280;
+  --text-mute: #9aa1ae;   /* ≥4.5:1 on bg/surface/surface-2 (WCAG AA) */
 
   --accent:      #ff4d2e;   /* energetic orange-red */
   --accent-soft: #ff714f;
