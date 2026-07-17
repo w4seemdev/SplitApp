@@ -15,6 +15,16 @@
 
 Create a free account, pick a split, and start logging sets in under a minute.
 
+## Screenshots
+
+![SplitApp home: pick a proven split and start training](docs/screenshots/01-home-hero.png)
+
+![Workout tracker: live volume, per-set logging, rest timer](docs/screenshots/02-tracker.png)
+
+![Training splits catalog and the weekly plan builder](docs/screenshots/03-splits-plan.png)
+
+![Progress dashboard: workouts, total volume, streak, session history](docs/screenshots/04-progress.png)
+
 ## Why This Exists
 
 Most lifters either follow a random routine or lose their training log in a notes app. SplitApp turns evidence-based hypertrophy guidelines (train each muscle ~2x/week, 10-20 sets/week, 6-12 reps) into a concrete weekly plan, then tracks every set against it. Data is local-first for instant load and offline use, and syncs to Supabase per account, so a lifter can log on their phone at the gym and review progress on their laptop at home.
