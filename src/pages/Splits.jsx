@@ -1,25 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { SPLITS } from '../data/splits.js'
-import { getMuscleGroup } from '../data/exercises.js'
 import { useUserStorage } from '../hooks/useUserStorage.js'
 import { usePageTitle } from '../hooks/usePageTitle.js'
 import { useAuth } from '../context/AuthContext.jsx'
-import { STORE, buildDefaultProgram } from '../lib/program.js'
+import { STORE, buildDefaultProgram, exercisesForDay } from '../lib/program.js'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
-
-// Pull the top exercises for the muscle groups a day targets (max 5 shown).
-function exercisesForDay(focusIds, limit = 5) {
-  const out = []
-  focusIds.forEach((id) => {
-    const group = getMuscleGroup(id)
-    if (group) {
-      // take the first 2 from each group so the day stays varied
-      group.exercises.slice(0, 2).forEach((ex) => out.push({ ...ex, color: group.color }))
-    }
-  })
-  return out.slice(0, limit)
-}
 
 export default function Splits() {
   usePageTitle('Training Splits')
@@ -104,6 +90,13 @@ export default function Splits() {
                 <div className="v">FREQUENCY</div>
               </div>
             </div>
+            <Link
+              to={`/splits/${s.id}`}
+              onClick={(e) => e.stopPropagation()}
+              style={{ color: 'var(--accent)', fontWeight: 600, marginTop: 14, display: 'inline-block' }}
+            >
+              Read the full {s.name} guide →
+            </Link>
           </div>
         ))}
       </div>

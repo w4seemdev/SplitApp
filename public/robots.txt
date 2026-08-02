@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
 
+# Sign-in gated or contentless — nothing here to index.
+Disallow: /plan
+Disallow: /tracker
+Disallow: /progress
+Disallow: /settings
+Disallow: /login
+Disallow: /reset-password
+
 Sitemap: https://split-app-tawny.vercel.app/sitemap.xml

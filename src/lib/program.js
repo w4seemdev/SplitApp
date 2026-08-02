@@ -44,6 +44,20 @@ export function poolForDay(focusIds) {
     }))
 }
 
+// The exercises a split day showcases: the first two from each target muscle
+// group, capped. Used for read-only previews (split cards, landing pages) —
+// buildDefaultProgram applies the same picking rule to build a real program.
+export function exercisesForDay(focusIds, limit = 5) {
+  const out = []
+  focusIds.forEach((id) => {
+    const group = getMuscleGroup(id)
+    if (group) {
+      group.exercises.slice(0, 2).forEach((ex) => out.push({ ...ex, color: group.color }))
+    }
+  })
+  return out.slice(0, limit)
+}
+
 // Build a fresh program for a split, pre-selecting a sensible default set of
 // exercises per day (the first two from each target muscle group, capped).
 export function buildDefaultProgram(splitId) {
