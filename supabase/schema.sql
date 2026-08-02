@@ -51,26 +51,26 @@ create table if not exists public.user_data (
 -- ----------------------------------------------------------------------------
 alter table public.user_data enable row level security;
 
-drop policy if exists "user_data_select_own" on public.user_data;
-create policy "user_data_select_own"
+drop policy if exists "users read own data" on public.user_data;
+create policy "users read own data"
   on public.user_data for select
   using (auth.uid() = user_id);
 
-drop policy if exists "user_data_insert_own" on public.user_data;
-create policy "user_data_insert_own"
+drop policy if exists "users insert own data" on public.user_data;
+create policy "users insert own data"
   on public.user_data for insert
   with check (auth.uid() = user_id);
 
 -- Both clauses are needed: `using` decides which existing rows may be updated,
 -- `with check` stops a user from reassigning a row to somebody else's user_id.
-drop policy if exists "user_data_update_own" on public.user_data;
-create policy "user_data_update_own"
+drop policy if exists "users update own data" on public.user_data;
+create policy "users update own data"
   on public.user_data for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
-drop policy if exists "user_data_delete_own" on public.user_data;
-create policy "user_data_delete_own"
+drop policy if exists "users delete own data" on public.user_data;
+create policy "users delete own data"
   on public.user_data for delete
   using (auth.uid() = user_id);
 
