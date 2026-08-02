@@ -22,6 +22,7 @@ export default function ResetPassword() {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
+    if (!supabase) return
     let active = true
     supabase.auth.getSession().then(({ data }) => {
       if (active && data.session) setReady(true)

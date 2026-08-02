@@ -14,6 +14,7 @@ const hydrations = new Map() // userId -> Promise<{ [key]: value }>
 // Fetch all rows for a user once per session; concurrent callers share the
 // same promise, and the resolved map is cached for later mounts.
 export function hydrate(userId) {
+  if (!supabase) return Promise.resolve({})
   if (!hydrations.has(userId)) {
     const promise = supabase
       .from('user_data')
@@ -34,6 +35,7 @@ export function hydrate(userId) {
 }
 
 function write({ userId, key, value }) {
+  if (!supabase) return
   supabase
     .from('user_data')
     .upsert(
