@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { supabase, SUPABASE_SETUP_MESSAGE } from '../lib/supabase.js'
-import { flush as flushCloud } from '../lib/cloudStore.js'
+import { flush as flushCloud, resetHydrations } from '../lib/cloudStore.js'
 
 const AuthContext = createContext(null)
 
@@ -42,7 +42,10 @@ export function AuthProvider({ children }) {
         clearTimeout(timer)
         if (active) setLoading(false)
       })
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // Session ended elsewhere (expiry, another tab): drop the cached cloud
+      // snapshot so the next sign-in re-reads from the server.
+      if (event === 'SIGNED_OUT') resetHydrations()
       setUser(mapUser(session?.user))
     })
     return () => {
@@ -84,6 +87,9 @@ export function AuthProvider({ children }) {
     } catch {
       // network failure — the local session is cleared regardless
     }
+    // Drop the cached snapshot: without this, signing back in within the same
+    // tab replays the previous session's data over whatever is current.
+    resetHydrations()
     setUser(null)
   }
 
