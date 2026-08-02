@@ -20,6 +20,16 @@ export default defineConfig({
         'icons/apple-touch-icon.png',
       ],
       workbox: {
+        // scripts/prerender.mjs writes extra static HTML per route after the
+        // build. Precaching them would bloat the SW for no gain — navigateFallback
+        // already serves index.html for every navigation, so index.html stays in.
+        globIgnores: [
+          '**/node_modules/**/*',
+          'splits.html',
+          'exercises.html',
+          'splits/**/*.html',
+          'exercises/**/*.html',
+        ],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

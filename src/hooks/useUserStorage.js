@@ -17,6 +17,19 @@ function read(key, fallback) {
   }
 }
 
+// Every stored value carries a sibling "<key>:ts" epoch-ms stamp, written only
+// when the user actually changes something. Conflicts resolve last-write-wins
+// against the row's updated_at, so a device that has been offline cannot
+// overwrite newer work done elsewhere. A missing stamp reads as 0, meaning
+// "older than anything in the cloud" — the safe default for installs that
+// predate this, since the cloud copy is the synced source of truth.
+const TS = ':ts'
+
+function readTs(key) {
+  const n = Number(window.localStorage.getItem(key + TS))
+  return Number.isFinite(n) ? n : 0
+}
+
 // Accounts from the old local-only auth stored users under 'ironpath:users'.
 // Find the legacy id matching this email so that data can migrate to the cloud.
 function legacyLocalId(email) {
@@ -48,17 +61,27 @@ export function useUserStorage(suffix, defaultValue) {
     dirty.current = false
   }
 
-  // Once the signed-in user's cloud data arrives, adopt it. If the cloud has
-  // no row for this key but this browser does (current namespace or an old
-  // local-auth account), push the local value up — never the reverse.
+  // Once the signed-in user's cloud data arrives, reconcile it against what
+  // this browser holds. If the cloud has no row for this key but this browser
+  // does (current namespace or an old local-auth account), push the local
+  // value up.
   useEffect(() => {
     if (!userId) return
     let active = true
     cloudStore
       .hydrate(userId)
       .then((map) => {
-        if (Object.prototype.hasOwnProperty.call(map, suffix)) {
-          if (active && !dirty.current) setState({ key, value: map[suffix] })
+        const remote = map[suffix]
+        if (remote) {
+          const localTs = readTs(key)
+          if (remote.updatedAt > localTs) {
+            // Cloud is newer — adopt it, unless the user has edited since mount.
+            if (active && !dirty.current) setState({ key, value: remote.value })
+          } else if (localTs > remote.updatedAt) {
+            // This browser is newer (e.g. logged a workout while offline).
+            // Push it up instead of letting the stale cloud copy win.
+            cloudStore.save(userId, suffix, read(key, defaultValue))
+          }
           return
         }
         let localValue = read(key, undefined)
@@ -71,10 +94,8 @@ export function useUserStorage(suffix, defaultValue) {
             }
           }
         }
-        if (localValue !== undefined) {
-          map[suffix] = localValue // keep the shared hydration cache consistent
-          cloudStore.save(userId, suffix, localValue)
-        }
+        // save() patches the shared hydration cache, so later mounts see this.
+        if (localValue !== undefined) cloudStore.save(userId, suffix, localValue)
       })
       .catch(() => {
         // offline or cloud error — keep local values; next mount retries
@@ -87,6 +108,9 @@ export function useUserStorage(suffix, defaultValue) {
   useEffect(() => {
     try {
       window.localStorage.setItem(current.key, JSON.stringify(current.value))
+      // Stamp only real edits: a mount writing back the value it just read
+      // must not make this browser look newer than the cloud.
+      if (dirty.current) window.localStorage.setItem(current.key + TS, String(Date.now()))
     } catch {
       // storage unavailable — keep working in memory
     }

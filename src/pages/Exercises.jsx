@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { MUSCLE_GROUPS, ALL_EXERCISES } from '../data/exercises.js'
 import { usePageTitle } from '../hooks/usePageTitle.js'
 
@@ -152,6 +153,15 @@ export default function Exercises() {
                 <div className="anat">{m.anatomy}</div>
                 <p>{m.blurb}</p>
                 <span className="count">{m.exercises.length} exercises →</span>
+                <Link
+                  className="count"
+                  to={'/exercises/' + m.id}
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => e.stopPropagation()}
+                  style={{ display: 'block', marginTop: 10, textDecoration: 'underline' }}
+                >
+                  Best {m.name} exercises →
+                </Link>
               </div>
             </div>
           ))}
@@ -169,6 +179,13 @@ export default function Exercises() {
             {group.anatomy}
           </p>
           <p style={{ color: 'var(--text-dim)', maxWidth: 640, marginBottom: 24 }}>{group.blurb}</p>
+
+          <Link
+            to={'/exercises/' + group.id}
+            style={{ display: 'inline-block', marginBottom: 24, color: 'var(--accent)' }}
+          >
+            Full {group.name} guide →
+          </Link>
 
           <div className="card" style={{ overflow: 'hidden', padding: 0 }}>
             <table className="ex-table">

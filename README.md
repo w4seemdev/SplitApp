@@ -69,7 +69,22 @@ npm run build
 npm run preview
 ```
 
-**Environment variables** (optional: the app ships pointed at its production Supabase project; set these to use your own):
+### Backend setup (required)
+
+No credentials are baked into the build, so an install must be pointed at its
+own Supabase project. Without this the app still runs — the public pages work
+and you browse as a guest — but sign-in, sign-up and cloud sync are disabled
+and the console explains why.
+
+**1. Create a Supabase project**, then run [`supabase/schema.sql`](supabase/schema.sql)
+once in Dashboard → SQL Editor. It creates the `user_data` table and the
+Row-Level Security policies that isolate each user's rows.
+
+**2. In Dashboard → Authentication**, enable the Email provider, turn on
+*Confirm email* (the signup flow expects it), set the Site URL to your origin,
+and add `<your-origin>/reset-password` to the redirect allowlist.
+
+**3. Set the environment variables:**
 
 ```bash
 cp .env.example .env
@@ -78,15 +93,29 @@ cp .env.example .env
 ```
 VITE_SUPABASE_URL=https://YOUR-PROJECT-REF.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
+VITE_SITE_URL=https://your-domain.example
 ```
 
-The anon key is safe to expose in a frontend, every database row is protected server-side by Row-Level Security.
+The anon key is safe to expose in a frontend — Vite inlines it into the
+bundle either way — because every row is protected server-side by Row-Level
+Security. That protection comes entirely from step 1: **skip it and the table
+is world-readable.** Verify with an unauthenticated request, which must return
+`[]`:
+
+```bash
+curl "$VITE_SUPABASE_URL/rest/v1/user_data?select=*" -H "apikey: $VITE_SUPABASE_ANON_KEY"
+```
+
+`VITE_SITE_URL` is the origin this deployment is served from; it drives
+canonical tags, `og:url`, JSON-LD and the generated sitemap. Point it at your
+own domain — a stale value tells search engines your pages canonically live on
+somebody else's site.
 
 ## Engineering Highlights
 
 - **Row-Level Security done right**: user data lives in a `user_data (user_id, key, value jsonb)` table where RLS restricts every row to its owner. The client holds only the public anon key; the database enforces access, not the frontend.
 - **Local-first sync engine** (`src/lib/cloudStore.js`): a write-through cache with per-key debouncing (500ms) so rapid set-logging doesn't spam the network, plus automatic flush on `visibilitychange`/`pagehide` so switching apps mid-workout never drops the last sets.
-- **Conflict-safe hydration** (`src/hooks/useUserStorage.js`): cloud data is fetched once per session behind a shared promise; a dirty-flag guard guarantees a fresh device's defaults can never overwrite data another device already saved, and legacy local accounts migrate to the cloud automatically.
+- **Conflict-safe hydration** (`src/hooks/useUserStorage.js`): cloud data is fetched once per session behind a shared promise, and every local write patches that cache so a remounting component reads current data rather than a login-time snapshot. Conflicts resolve last-write-wins — rows carry `updated_at`, values carry a sibling `:ts` stamp written only on real edits, and the cloud copy is adopted only when it is genuinely newer. Writes that fail offline are queued and retried on reconnect. Legacy local accounts migrate to the cloud automatically.
 - **Mobile-correct timing**: the rest timer derives remaining time from a target timestamp instead of counting intervals, so it stays accurate through browser throttling in backgrounded or locked tabs.
 - **Accessibility built in**: skip-to-content link, `aria-live` announcements for timer milestones, focus management on route change, and a global error boundary.
 - **Production hygiene**: security headers (`X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`), SPA rewrites, Open Graph tags, `robots.txt` + `sitemap.xml`, and an auto-updating service worker.

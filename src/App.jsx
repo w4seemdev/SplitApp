@@ -7,8 +7,10 @@ import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 const Home = lazy(() => import('./pages/Home.jsx'))
 const Splits = lazy(() => import('./pages/Splits.jsx'))
+const SplitDetail = lazy(() => import('./pages/SplitDetail.jsx'))
 const Plan = lazy(() => import('./pages/Plan.jsx'))
 const Exercises = lazy(() => import('./pages/Exercises.jsx'))
+const MuscleDetail = lazy(() => import('./pages/MuscleDetail.jsx'))
 const Tracker = lazy(() => import('./pages/Tracker.jsx'))
 const Progress = lazy(() => import('./pages/Progress.jsx'))
 const Settings = lazy(() => import('./pages/Settings.jsx'))
@@ -48,7 +50,9 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/splits" element={<Splits />} />
+              <Route path="/splits/:splitId" element={<SplitDetail />} />
               <Route path="/exercises" element={<Exercises />} />
+              <Route path="/exercises/:muscleId" element={<MuscleDetail />} />
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route

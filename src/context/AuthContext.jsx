@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase.js'
-import { flush as flushCloud } from '../lib/cloudStore.js'
+import { supabase, SUPABASE_SETUP_MESSAGE } from '../lib/supabase.js'
+import { flush as flushCloud, resetHydrations } from '../lib/cloudStore.js'
 
 const AuthContext = createContext(null)
 
@@ -20,6 +20,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // No backend configured: settle as a signed-out guest so the public pages
+    // render instead of hanging on the loading screen forever.
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
     let active = true
     // Safety net: never leave the app stuck on the loading screen if the
     // session request hangs (flaky gym wifi).
@@ -36,7 +42,10 @@ export function AuthProvider({ children }) {
         clearTimeout(timer)
         if (active) setLoading(false)
       })
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      // Session ended elsewhere (expiry, another tab): drop the cached cloud
+      // snapshot so the next sign-in re-reads from the server.
+      if (event === 'SIGNED_OUT') resetHydrations()
       setUser(mapUser(session?.user))
     })
     return () => {
@@ -47,6 +56,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   async function signup(name, email, password) {
+    if (!supabase) throw new Error(SUPABASE_SETUP_MESSAGE)
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -62,6 +72,7 @@ export function AuthProvider({ children }) {
   }
 
   async function login(email, password) {
+    if (!supabase) throw new Error(SUPABASE_SETUP_MESSAGE)
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw new Error(error.message)
     const u = mapUser(data.user)
@@ -72,14 +83,18 @@ export function AuthProvider({ children }) {
   async function logout() {
     flushCloud() // land any debounced workout writes before the session ends
     try {
-      await supabase.auth.signOut()
+      if (supabase) await supabase.auth.signOut()
     } catch {
       // network failure — the local session is cleared regardless
     }
+    // Drop the cached snapshot: without this, signing back in within the same
+    // tab replays the previous session's data over whatever is current.
+    resetHydrations()
     setUser(null)
   }
 
   async function resetPassword(email) {
+    if (!supabase) throw new Error(SUPABASE_SETUP_MESSAGE)
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin + '/reset-password',
     })
