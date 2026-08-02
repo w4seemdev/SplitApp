@@ -6,7 +6,20 @@
 import { SPLITS } from './splits.js'
 import { MUSCLE_GROUPS, getMuscleGroup } from './exercises.js'
 
-export const SITE_URL = 'https://split-app-tawny.vercel.app'
+// The deployment's own origin, used for canonical tags, og:url, JSON-LD @ids
+// and the sitemap. It MUST be the host actually serving the site: a wrong
+// value here hands search engines a canonical pointing at somebody else's
+// domain, quietly donating this deployment's ranking signal to them.
+//
+// Read from both worlds because this module is imported twice: by the Vite
+// client bundle (import.meta.env) and directly by scripts/prerender.mjs under
+// plain Node (process.env).
+const siteUrlFromEnv =
+  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SITE_URL) ||
+  (typeof process !== 'undefined' && process.env && process.env.VITE_SITE_URL) ||
+  ''
+
+export const SITE_URL = (siteUrlFromEnv || 'http://localhost:5173').replace(/\/+$/, '')
 
 // Weekly volume guidance per muscle group, in the 10–20 set range the
 // hypertrophy literature converges on, adjusted for how much indirect work

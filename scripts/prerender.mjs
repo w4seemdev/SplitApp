@@ -88,6 +88,14 @@ function renderHead(html, { url, title, description }) {
     `<meta property="og:description" content="${esc(description)}" />`,
     'og:description'
   )
+  // index.html carries a literal host for og:image; restamp it so a buyer's
+  // build never advertises the previous owner's domain.
+  out = replaceTag(
+    out,
+    /<meta property="og:image" content="[^"]*"\s*\/?>/,
+    `<meta property="og:image" content="${esc(`${SITE_URL}/icons/icon-512.png`)}" />`,
+    'og:image'
+  )
   return out
 }
 
@@ -608,7 +616,19 @@ async function main() {
 
   await writeFile(join(DIST, 'sitemap.xml'), sitemap(pages), 'utf8')
 
-  console.log(`prerender: wrote ${pages.length} HTML pages + sitemap.xml to dist/`)
+  // public/robots.txt ships with a placeholder Sitemap host; point it at this
+  // deployment so the buyer's site does not advertise the seller's sitemap.
+  const robotsPath = join(DIST, 'robots.txt')
+  const robots = await readFile(robotsPath, 'utf8')
+  await writeFile(
+    robotsPath,
+    robots.replace(/^Sitemap:.*$/m, `Sitemap: ${SITE_URL}/sitemap.xml`),
+    'utf8'
+  )
+
+  console.log(
+    `prerender: wrote ${pages.length} HTML pages + sitemap.xml + robots.txt to dist/ (site: ${SITE_URL})`
+  )
 }
 
 main().catch((err) => {
