@@ -68,9 +68,15 @@ export function buildDefaultProgram(splitId) {
     splitName: split.name,
     days: split.days.map((day) => {
       const picks = []
+      // Fill the day rather than taking a flat two per group: a Bro Split
+      // chest day targets one group and would otherwise generate two
+      // exercises, contradicting the split's whole premise. Multi-focus days
+      // are unaffected because the slice(0, 7) cap below still applies.
+      const perGroup = Math.max(2, Math.ceil(7 / day.focus.length))
       day.focus.forEach((id) => {
         const group = getMuscleGroup(id)
-        if (group) group.exercises.slice(0, 2).forEach((ex) => picks.push(makeExercise(ex.name, id)))
+        if (group)
+          group.exercises.slice(0, perGroup).forEach((ex) => picks.push(makeExercise(ex.name, id)))
       })
       return { type: 'training', name: day.name, focus: day.focus, exercises: picks.slice(0, 7) }
     }),

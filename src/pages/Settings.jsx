@@ -4,8 +4,10 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { useUserStorage } from '../hooks/useUserStorage.js'
 import { STORE } from '../lib/program.js'
 import { unitLabel } from '../lib/units.js'
+import { usePageTitle } from '../hooks/usePageTitle.js'
 
 export default function Settings() {
+  usePageTitle('Settings')
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [program, setProgram] = useUserStorage(STORE.program, null)

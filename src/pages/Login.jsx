@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { usePageTitle } from '../hooks/usePageTitle.js'
 
 // Info/success messages reuse the error box layout but in accent colors so a
 // happy state (account created, reset email sent) never reads as a failure.
@@ -14,6 +15,7 @@ const infoStyle = {
 }
 
 export default function Login() {
+  usePageTitle('Log In')
   const { login, signup, resetPassword } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()

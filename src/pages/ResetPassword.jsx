@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
+import { usePageTitle } from '../hooks/usePageTitle.js'
 
 const infoStyle = {
   background: 'var(--accent-glow)',
@@ -15,6 +16,7 @@ const infoStyle = {
 // the user in with a temporary recovery session; once that session exists we
 // let them set a new password via updateUser.
 export default function ResetPassword() {
+  usePageTitle('Reset Password')
   const [ready, setReady] = useState(false)
   const [form, setForm] = useState({ password: '', confirm: '' })
   const [error, setError] = useState('')
